@@ -160,17 +160,6 @@ Internally, Git updates a special branch called:
 origin/main
 ```
 
-Your repository now looks like this:
-
-```text
-             origin/main
-                  |
-A --- B --------- C
- ^
- |
-main (your current branch)
-```
-
 Notice:
 
 - Your files did **not** change.
@@ -328,54 +317,6 @@ origin  https://github.com/username/git-training-demo.git (fetch)
 origin  https://github.com/username/git-training-demo.git (push)
 ```
 
----
-
-## Tracking Branches
-
-A tracking branch connects a local branch with a remote branch.
-
-For example:
-
-```text
-Local Branch          Remote Tracking Branch
-
-main   ----------->   origin/main
-```
-
-You can view tracking information with:
-
-```bash
-git branch -vv
-```
-
-Example output:
-
-```text
-* main a123abc [origin/main] Update README
-```
-
-This tells us:
-
-- Current branch is `main`
-- Latest commit is `a123abc`
-- It tracks `origin/main`
-
-Tracking branches allow simple commands like:
-
-```bash
-git push
-```
-
-instead of:
-
-```bash
-git push origin main
-```
-
-Git already knows where your branch belongs.
-
----
-
 # 6. Common Synchronization Situations
 
 Let's look at the three situations you'll encounter most often.
@@ -508,7 +449,28 @@ To prevent this, Git rejects your push and asks you to first synchronize with th
 
 ## Merge Example
 
-Git creates a merge commit that combines both histories.
+When both you and another developer create new commits, Git has two separate lines of history.
+
+Before the merge, the history looks like this:
+
+```text
+        C (your commit)
+       /
+A --- B
+       \
+        D (remote commit)
+```
+
+Both commits started from the same commit (`B`), but they contain different work.
+
+- Commit **C** contains **your changes**.
+- Commit **D** contains **the other developer's changes**.
+
+Neither commit contains the other, so Git cannot simply move one branch forward.
+
+Instead, Git creates a **new commit** called a **merge commit**.
+
+After the merge:
 
 ```text
         C
@@ -520,18 +482,120 @@ A --- B   M
 
 The merge commit `M` has **two parent commits**:
 
-- One parent is your commit (`C`)
-- One parent is the remote commit (`D`)
+- One parent points to your commit (`C`).
+- The other parent points to the remote commit (`D`).
 
-Nothing is lost.
+Think of the merge commit as saying:
+
+> "I combine everything from both branches."
+
+Unlike a normal commit, which has **one parent**, a merge commit has **two parents** because it represents the point where two separate histories come back together.
+
+The resulting history now contains **both developers' work**:
+
+```text
+A --- B --- C  (your work)
+       \     \
+        D ----M (combined history)
+```
+
+Nothing is overwritten or deleted.
+
+- Your commit (`C`) is still part of the project's history.
+- The remote commit (`D`) is still part of the project's history.
+- The merge commit (`M`) simply joins them together into a single timeline so everyone can continue working from the same point.
+
+After the merge, any new commits are created from `M`:
+
+```text
+        C
+       / \
+A --- B   M --- E
+       \ /
+        D
+```
+
+Now both developers are working from the same shared history again.
 
 ---
 
 ## Rebase Example
 
-Instead of creating a merge commit, Git can replay your work on top of the latest remote history.
+A merge isn't the only way Git can combine two lines of history.
 
-Before rebasing:
+Another option is **rebase**.
+
+Instead of creating a merge commit, Git **moves your commits so they appear as if they were created after the latest remote commits**.
+
+Before rebasing, the history looks like this:
+
+```text
+        C (your commit)
+       /
+A --- B
+       \
+        D (remote commit)
+```
+
+Both you and another developer started from commit `B`, but each created a different commit.
+
+With a merge, Git would keep both branches and create a new merge commit.
+
+With a rebase, Git takes a different approach.
+
+### Step 1 — Temporarily Remove Your Commits
+
+Git temporarily removes your local commit (`C`).
+
+Your branch now looks like this:
+
+```text
+A --- B
+       \
+        D
+```
+
+Your work isn't deleted—Git simply stores it temporarily while it updates your branch.
+
+---
+
+### Step 2 — Move to the Latest Remote Commit
+
+Git updates your branch so it points to the latest remote commit (`D`).
+
+Your branch is now up to date with the remote repository.
+
+---
+
+### Step 3 — Replay Your Work
+
+Finally, Git reapplies your changes on top of commit `D`.
+
+The history becomes:
+
+```text
+A --- B --- D --- C'
+```
+
+Notice that the commit is now called **`C'` (C prime)** instead of `C`.
+
+This is because Git actually creates a **new commit**.
+
+Even though the code changes are the same, the commit has:
+
+- a different parent commit
+- a different commit ID (SHA)
+- a different position in the history
+
+The original commit `C` is replaced by the new commit `C'`.
+
+---
+
+### Why Do Developers Use Rebase?
+
+One advantage of rebasing is that the project history becomes a straight line.
+
+Instead of:
 
 ```text
         C
@@ -541,74 +605,57 @@ A --- B
         D
 ```
 
-After rebasing:
+or
+
+```text
+        C
+       / \
+A --- B   M
+       \ /
+        D
+```
+
+you get:
 
 ```text
 A --- B --- D --- C'
 ```
 
-`C'` represents your original changes applied after commit `D`.
-
-The history becomes linear, making it easier to read.
+This linear history is often easier to read because it looks like everyone committed one after another, even though the work happened at the same time.
 
 ---
 
-## When Does a Conflict Occur?
+### Merge vs. Rebase
 
-Suppose the original file contains:
+Both approaches preserve everyone's work.
 
-```text
-Welcome to Git Training
-```
+The difference is **how the history looks**.
 
-You change it locally:
+**Merge:**
 
 ```text
-Welcome to Git Training
-Created by Alice
+        C
+       / \
+A --- B   M
+       \ /
+        D
 ```
 
-Another developer changes the same lines remotely:
+- Keeps the true history of what happened.
+- Creates a merge commit.
+- History shows where branches split and rejoined.
+
+**Rebase:**
 
 ```text
-Welcome to Git Training
-Version 2
+A --- B --- D --- C'
 ```
 
-When Git tries to combine the histories, it cannot determine which version should be kept.
+- Rewrites your local commits.
+- Does not create a merge commit.
+- Produces a cleaner, linear history.
 
-Rather than guessing, Git pauses and reports a **merge conflict**.
-
-You must edit the file, choose the correct content, save it, and complete the merge.
-
-The important point is:
-
-> **Git only asks for help when it cannot safely combine changes automatically.**
-
----
-
-# Optional Topic — Upstream and Forks
-
-In open-source projects, developers often work with **forks**.
-
-In this workflow:
-
-- `origin` usually points to **your personal fork**
-- `upstream` points to the **original project**
-
-Example:
-
-```bash
-git remote add upstream https://github.com/original-owner/project.git
-```
-
-Download updates from the original project:
-
-```bash
-git fetch upstream
-```
-
-This workflow is extremely common in open-source development but is optional for beginners.
+Both approaches include the same code changes. The difference is only in how Git records the project's history.
 
 ---
 
