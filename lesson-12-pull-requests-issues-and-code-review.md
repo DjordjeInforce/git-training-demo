@@ -174,47 +174,627 @@ The existing PR updates automatically.
 
 ## 8. Branch Protection Concept
 
-Branch protection helps teams protect important branches like `main`.
+Branch protection is a GitHub feature that helps teams protect important branches, especially branches like:
 
-Rules may require:
+```text
+main
+master
+release
+```
 
-- Pull Requests before merging
-- One or more reviews
-- Passing checks
-- No force pushes
+These branches usually contain stable code that should always be in a working state.
 
-You do not need to configure every rule now. Understand the purpose:
+Without protection, any developer with access could accidentally:
 
-> Important branches should not be changed carelessly.
+- Push broken code directly to `main`
+- Delete important commits
+- Skip code review
+- Merge changes without testing
+
+Branch protection adds rules that control how changes enter important branches.
+
+---
+
+# Why Do Teams Protect Branches?
+
+In a professional development environment, the `main` branch represents the official version of the application.
+
+The goal is:
+
+> Keep the main branch stable, tested, and safe for everyone.
+
+Instead of allowing developers to directly change `main`, teams usually follow this workflow:
+
+```text
+Developer
+
+    |
+    v
+
+Create feature branch
+
+    |
+    v
+
+Make changes
+
+    |
+    v
+
+Create Pull Request
+
+    |
+    v
+
+Review + Automated Checks
+
+    |
+    v
+
+Merge into main
+```
+
+Branch protection helps enforce this process.
+
+---
+
+# Common Branch Protection Rules
+
+## 1. Require Pull Requests Before Merging
+
+This prevents developers from pushing directly to the protected branch.
+
+Without protection:
+
+```text
+Developer
+    |
+    v
+git push main
+    |
+    v
+main changes immediately
+```
+
+With protection:
+
+```text
+Developer
+    |
+    v
+Feature branch
+    |
+    v
+Pull Request
+    |
+    v
+Review
+    |
+    v
+Merge into main
+```
+
+The team gets a chance to review the change before it becomes part of the main codebase.
+
+---
+
+# 2. Require Code Reviews
+
+A team may require another developer to approve changes before merging.
+
+Example:
+
+```text
+Developer creates Pull Request
+
+        |
+        v
+
+Reviewer checks the code
+
+        |
+        v
+
+Approved
+
+        |
+        v
+
+Merge allowed
+```
+
+Code review helps teams:
+
+- Find bugs
+- Share knowledge
+- Maintain coding standards
+- Discuss better solutions
+
+---
+
+# 3. Require Passing Checks
+
+Branch protection can require automated checks to pass before merging.
+
+Examples:
+
+- Unit tests
+- Integration tests
+- Build verification
+- Code quality checks
+- Security scans
+
+Example:
+
+```text
+Pull Request Checks
+
+✓ Build completed
+✓ Unit tests passed
+✓ Code formatting passed
+
+Merge allowed
+```
+
+If a test fails:
+
+```text
+Pull Request Checks
+
+✓ Build completed
+✗ Unit tests failed
+
+Merge blocked
+```
+
+The developer must fix the problem before merging.
+
+---
+
+# 4. Prevent Force Pushes
+
+A force push can rewrite Git history.
+
+Example:
+
+Normal history:
+
+```text
+A --- B --- C
+```
+
+A force push could replace it with:
+
+```text
+A --- D
+```
+
+Commits `B` and `C` may disappear from the branch.
+
+This can be dangerous on shared branches.
+
+Branch protection can prevent force pushes to important branches like `main`.
+
+---
+
+# 5. Prevent Branch Deletion
+
+Teams may also prevent accidental deletion of important branches.
+
+For example:
+
+```text
+main
+release
+production
+```
+
+should usually always exist.
+
+Deleting these branches could interrupt development or deployment processes.
+
+---
+
+# Example Protected Main Branch
+
+A typical company might configure `main` like this:
+
+```text
+main branch protection rules:
+
+✓ Require Pull Request before merging
+✓ Require 2 approvals
+✓ Require tests to pass
+✓ Prevent force pushes
+✓ Prevent branch deletion
+```
+
+Now every change follows the same safe process.
+
+---
+
+# Branch Protection and Collaboration
+
+Branch protection creates a safety system around shared code.
+
+Without protection:
+
+```text
+Anyone
+   |
+   v
+Direct changes to main
+   |
+   v
+Possible broken application
+```
+
+With protection:
+
+```text
+Developer
+   |
+   v
+Feature branch
+   |
+   v
+Pull Request
+   |
+   v
+Review + Automated Checks
+   |
+   v
+Protected main branch
+```
+
+The team can move quickly while reducing the risk of breaking the application.
+
+---
+
+# Beginner Understanding
+
+For now, remember:
+
+> Branch protection prevents important branches from being changed carelessly.
+
+It does not stop developers from working.
+
+Instead, it creates a controlled process where changes are:
+
+- Reviewed
+- Tested
+- Approved
+- Safely merged
+
+---
+
+# Branch Protection in Real Teams
+
+In many companies:
+
+- Developers never commit directly to `main`.
+- Every change goes through a Pull Request.
+- Automated tests run automatically.
+- Reviewers approve changes.
+- Only then can the code be merged.
+
+This process is one of the foundations of professional software development workflows.
 
 ---
 
 ## 9. GitHub Actions Concept
 
-GitHub Actions is automation on GitHub.
+GitHub Actions is a built-in automation platform inside GitHub.
 
-Common uses:
+It allows developers to create automated workflows that run whenever something happens in a repository.
 
-- Run tests
-- Check formatting
-- Build the project
-- Deploy software
+For example:
 
-In a PR, Actions may show checks as passed or failed.
+- Someone pushes new code.
+- Someone creates a Pull Request.
+- A new release is created.
+- A scheduled task needs to run.
 
-Beginner idea:
-
-> A passing check is a signal that the change meets an automated quality rule.
+GitHub Actions automatically starts the defined workflow.
 
 ---
 
-## Optional: Forks
+## Why Do Teams Use GitHub Actions?
 
-A fork is your own GitHub copy of someone else's repository.
+In a professional software team, developers do not manually check every change.
 
-Forks are common in open-source contribution.
+Instead, teams automate repetitive tasks.
 
-For most team projects in this beginner course, you can work with branches in the main shared repository instead.
+GitHub Actions can automatically:
+
+- Run automated tests
+- Check code formatting
+- Analyze code quality
+- Build applications
+- Package software
+- Deploy applications
+- Publish releases
+
+Automation helps teams find problems earlier and reduces manual work.
+
+---
+
+## Example Workflow
+
+Imagine a developer creates a Pull Request:
+
+```text
+Developer
+    |
+    v
+Creates Pull Request
+    |
+    v
+GitHub Actions starts automatically
+    |
+    +----------------+
+    |                |
+    v                v
+Run Tests       Check Formatting
+    |                |
+    v                v
+Passed          Passed
+    |
+    v
+Pull Request can be reviewed
+```
+
+Before merging the Pull Request, the team can see whether the automated checks passed.
+
+---
+
+# GitHub Actions in a Pull Request
+
+When a Pull Request is opened, GitHub can display automated checks.
+
+Example:
+
+```text
+Pull Request
+
+✓ Build application
+✓ Run unit tests
+✓ Check code style
+
+All checks passed
+```
+
+or:
+
+```text
+Pull Request
+
+✓ Build application
+✗ Run unit tests
+
+Some checks failed
+```
+
+A failed check does not necessarily mean Git is broken.
+
+It means that one of the automated rules defined by the team found a problem.
+
+---
+
+# What Is a Workflow?
+
+A GitHub Actions workflow is a file that describes:
+
+- When automation should run
+- What tasks should be performed
+- Which environment should execute the tasks
+
+Workflows are stored inside the repository:
+
+```text
+.github/
+   workflows/
+       build.yml
+       tests.yml
+```
+
+The workflow files use YAML format.
+
+Example:
+
+```yaml
+name: Run Tests
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: npm test
+```
+
+You do not need to create workflows yet, but it is important to understand the concept.
+
+---
+
+# Important GitHub Actions Terms
+
+## Workflow
+
+A complete automation process.
+
+Example:
+
+"Run all tests when someone creates a Pull Request."
+
+---
+
+## Event
+
+Something that triggers a workflow.
+
+Examples:
+
+```text
+push
+pull_request
+schedule
+release
+```
+
+Example:
+
+```yaml
+on:
+  pull_request:
+```
+
+Means:
+
+"Run this workflow whenever a Pull Request is created or updated."
+
+---
+
+## Job
+
+A group of related tasks.
+
+Example:
+
+```text
+Test Application
+
+- Install dependencies
+- Run tests
+- Generate report
+```
+
+A workflow can contain multiple jobs.
+
+---
+
+## Step
+
+A single task inside a job.
+
+Example:
+
+```text
+Step 1:
+Checkout the code
+
+Step 2:
+Install dependencies
+
+Step 3:
+Run tests
+```
+
+---
+
+# GitHub Actions and Quality Gates
+
+Many teams use GitHub Actions as a **quality gate**.
+
+A quality gate means:
+
+> Code must pass certain automated checks before it can be merged.
+
+Example rules:
+
+A Pull Request cannot merge unless:
+
+✓ All automated tests pass  
+✓ Code builds successfully  
+✓ No critical issues are found  
+
+This helps protect the main branch from broken code.
+
+---
+
+# Example From a Real Development Team
+
+A developer changes a login feature.
+
+They create a Pull Request.
+
+GitHub Actions automatically:
+
+1. Downloads the code.
+2. Installs dependencies.
+3. Runs automated tests.
+4. Checks code quality.
+5. Reports the result.
+
+If everything passes:
+
+```text
+✓ All checks passed
+```
+
+The team can review and merge.
+
+If something fails:
+
+```text
+✗ Tests failed
+```
+
+The developer investigates and fixes the problem before merging.
+
+---
+
+# Beginner Understanding
+
+For now, remember:
+
+> GitHub Actions is a way to make GitHub automatically perform tasks for you.
+
+A passing GitHub Actions check means:
+
+> "The automated rules configured by the team have passed."
+
+It does **not** guarantee the software is perfect, but it gives the team confidence that important checks were completed.
+
+---
+
+# GitHub Actions in the Development Workflow
+
+A typical workflow looks like this:
+
+```text
+Developer writes code
+          |
+          v
+Creates commit
+          |
+          v
+Pushes to GitHub
+          |
+          v
+Creates Pull Request
+          |
+          v
+GitHub Actions runs automatically
+          |
+          v
+Tests and checks complete
+          |
+          v
+Code review
+          |
+          v
+Merge into main branch
+```
+
+GitHub Actions is one of the foundations of modern Continuous Integration (CI) practices.
 
 ---
 
