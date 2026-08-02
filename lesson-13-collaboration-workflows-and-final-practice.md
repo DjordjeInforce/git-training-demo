@@ -616,11 +616,3 @@ You learned how to:
 
 You are now familiar with the basic Git workflow used by software development teams.
 
-Next steps after this course include:
-
-- Advanced branching strategies
-- Rebasing
-- Git internals
-- CI/CD pipelines
-- GitHub Actions automation
-- Advanced team workflows
