@@ -19,7 +19,6 @@ By the end of this lesson, you will be able to:
 - Understand what `origin` and tracking branches are.
 - View tracking branch information with `git branch -vv`.
 - Understand why pull conflicts occur and how they are resolved.
-- Recognize the purpose of `upstream` repositories in fork-based workflows.
 
 ---
 
