@@ -178,26 +178,6 @@ stash@{0}: On main: WIP: Update login page
 
 Using meaningful names makes it much easier to find the correct stash later.
 
----
-
-# 6 - Stashing Only Selected Changes
-
-Sometimes you don't want to stash everything.
-
-Git allows you to choose which changes should be stashed.
-
-Use:
-
-```bash
-git stash push -p
-```
-
-Git will display each change individually.
-
-Example:
-
-```text
-Stash this hunk? [y,n,q,a,d]
 ```
 
 You decide which changes to stash and which changes remain in your working directory.
