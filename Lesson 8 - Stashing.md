@@ -178,13 +178,10 @@ stash@{0}: On main: WIP: Update login page
 
 Using meaningful names makes it much easier to find the correct stash later.
 
-```
-
 You decide which changes to stash and which changes remain in your working directory.
 
 This is called an **interactive** or **partial** stash.
 
----
 
 # 7 - Common Uses for Git Stash
 
